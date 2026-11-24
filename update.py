@@ -102,7 +102,9 @@ def decide(cur, cand, res, fails):
 def main():
     cur = {it[2]: it for it in parse(open(PLAYLIST, encoding='utf-8').read())}
     fails = json.load(open(STATE))['fails'] if os.path.exists(STATE) else {}
-    cand = candidates()
+    # Streams that failed on the home network, even if they play from GitHub's servers
+    home_blocked = set(open('home_blocked.txt', encoding='utf-8').read().split())
+    cand = {u: it for u, it in candidates().items() if u not in home_blocked}
     everything = {**cand, **cur}
     print('current', len(cur), 'candidates', len(cand), 'to test', len(everything), flush=True)
     with ThreadPoolExecutor(16) as x:
